@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POLYPLAY - 动态广场 (马里奥版)</title>
+    <!-- 导入Google字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=ZCOOL+KuaiLe&family=ZCOOL+QingKe+HuangYou&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- 导入Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        :root {
+            /* 马里奥风格色调色板 - 优化配色 */
+            --mario-red: #E52521;
+            --mario-dark-red: #CE000C;
+            --mario-blue: #049CD8;
+            --mario-dark-blue: #0076BC;
+            --mario-green: #43B047;
+            --mario-dark-green: #009444;
+            --mario-yellow: #FBD000;
+            --mario-orange: #F37021;
+            --mario-brown: #8C6239;
+            --mario-black: #000000;
+            --mario-white: #FFFFFF;
+            --mario-sky-blue: #5BC3F0;
+            --mario-ground: #8C6239;
+            --mario-light-gray: #F0F0F0;
+            --mario-gray: #999999;
+            --mario-dark-gray: #666666;
+            
+            /* 新增和修改 */
+            --mario-bg-blue: #8ECFFD; /* 更明亮的天空蓝 */
+            --header-bg: var(--mario-red); /* 红色标题背景 */
+            --nav-bg: var(--mario-black); /* 黑色导航栏 */
+            
+            /* 文本颜色 */
+            --text-primary: #221E1F;
+            --text-secondary: #555555;
+            --text-white: #FFFFFF;
+            
+            /* 背景颜色 */
+            --bg-primary: var(--mario-bg-blue); /* 天空蓝色 */
+            --bg-secondary: #FFFFFF;
+            --card-bg: #FFFFFF;
+            
+            /* 阴影 - 更扁平化 */
+            --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 3px 8px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            70% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        html, body {
+            font-family: 'ZCOOL QingKe HuangYou', 'Poppins', sans-serif;
+            color: var(--text-primary);
+            background-color: var(--mario-bg-blue);
+            line-height: 1.5;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            padding-bottom: 80px;
+            padding-top: 0;
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: var(--bg-primary);
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 顶部标题栏 */
+        .top-header {
+            background: var(--mario-black);
+            color: white;
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 4px solid #444;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .app-title {
+            font-family: 'Bangers', 'ZCOOL KuaiLe', cursive;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 0;
+            text-shadow: 3px 3px 0 #444, 
+                         -1px -1px 0 #444,  
+                         1px -1px 0 #444,
+                         -1px 1px 0 #444,
+                         1px 1px 0 #444;
+            letter-spacing: 1px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-button {
+            background-color: var(--mario-yellow);
+            color: var(--mario-black);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 0 var(--mario-orange);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .action-button:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 var(--mario-orange);
+        }
+
+        /* 动态卡片样式 */
+        .moments-container {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 80px;
+        }
+
+        .moment-card {
+            background-color: var(--mario-white);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 5px 0 var(--mario-blue), 0 10px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+            border: 2px solid var(--mario-blue);
+            overflow: hidden;
+        }
+
+        .moment-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 0 var(--mario-blue), 0 15px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        /* 用户信息 */
+        .moment-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 3px solid var(--mario-yellow);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+            object-fit: cover;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--mario-dark-blue);
+            margin-bottom: 3px;
+        }
+
+        .post-time {
+            font-size: 0.8rem;
+            color: #777;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* 动态内容 */
+        .moment-content {
+            margin-bottom: 15px;
+        }
+
+        .moment-text {
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            color: var(--mario-black);
+        }
+
+        .moment-text.collapsed {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .moment-text.expanded {
+            display: block;
+        }
+
+        .read-more {
+            color: var(--mario-blue);
+            font-size: 0.9rem;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .read-more:hover {
+            text-decoration: underline;
+        }
+
+        /* 图片画廊 */
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .gallery-item {
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 3px 0 rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.03);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .gallery-item.single {
+            grid-column: span 3;
+            height: 200px;
+        }
+
+        .gallery-item.large {
+            grid-column: span 3;
+            grid-row: span 2;
+            height: auto;
+        }
+
+        /* 动态交互 */
+        .moment-actions {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 15px;
+        }
+
+        .action-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #555;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 8px 12px;
+            border-radius: 20px;
+            transition: all 0.2s;
+        }
+
+        .action-item:hover {
+            background-color: var(--mario-beige);
+        }
+
+        .action-item.like {
+            color: var(--mario-red);
+        }
+
+        .action-item i {
+            font-size: 1.1rem;
+        }
+
+        /* 评论区 */
+        .comment-section {
+            display: none;
+            margin-top: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid #eee;
+        }
+
+        .comment-section.active {
+            display: block;
+        }
+
+        .comment-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .comment-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid var(--mario-yellow);
+        }
+
+        .comment-content {
+            flex: 1;
+            background-color: white;
+            border-radius: 8px;
+            padding: 8px 12px;
+            border: 1px solid #eee;
+        }
+
+        .commenter-name {
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: var(--mario-dark-blue);
+            margin-bottom: 3px;
+            display: block;
+        }
+
+        .comment-text {
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        .comment-form {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .comment-input {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            background-color: white;
+            outline: none;
+        }
+
+        .comment-input:focus {
+            border-color: var(--mario-blue);
+        }
+
+        .comment-submit {
+            background-color: var(--mario-red);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 0 var(--mario-dark-red);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .comment-submit:active {
+            transform: translateY(3px);
+            box-shadow: 0 0 0 var(--mario-dark-red);
+        }
+
+        /* 发布动态区域 */
+        .post-composer {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 420px;
+            background: linear-gradient(180deg, var(--mario-green) 0%, var(--mario-dark-green) 100%);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 5;
+            border: 3px solid var(--mario-dark-green);
+        }
+
+        .composer-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .composer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--mario-yellow);
+        }
+
+        .composer-input {
+            flex: 1;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 15px;
+            background-color: white;
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        .composer-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .composer-tools {
+            display: flex;
+            gap: 12px;
+        }
+
+        .composer-tool {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .composer-tool:hover {
+            background-color: rgba(255, 255, 255, 0.5);
+            transform: scale(1.1);
+        }
+
+        .post-btn {
+            background-color: var(--mario-yellow);
+            color: var(--mario-dark-red);
+            border: none;
+            border-radius: 20px;
+            padding: 8px 20px;
+            font-weight: bold;
+            box-shadow: 0 3px 0 var(--mario-orange);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .post-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 0 0 var(--mario-orange);
+        }
+
+        /* 图片预览 */
+        .image-preview-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            display: none;
+        }
+
+        .image-preview-overlay.active {
+            display: flex;
+        }
+
+        .preview-image {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+
+        .close-preview {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 底部导航栏 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--mario-black);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            max-width: 450px;
+            margin: 0 auto;
+            border-radius: 20px 20px 0 0;
+            border-top: 6px solid #444;
+            height: 80px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--mario-white);
+            width: 60px;
+            transition: all 0.3s;
+        }
+
+        .nav-item .icon-bg {
+            width: 50px;
+            height: 50px;
+            background-color: var(--mario-yellow);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+            font-size: 20px;
+            color: var(--mario-black);
+            border: 4px solid var(--mario-white);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+
+        .nav-item.active .icon-bg {
+            transform: translateY(-15px) scale(1.1);
+        }
+
+        .nav-item span {
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .nav-item:hover .icon-bg {
+            animation: bounce 0.5s;
+        }
+        
+        .nav-item.active {
+            color: var(--mario-white);
+        }
+        
+        .nav-item.active span {
+            font-weight: 800;
+        }
+
+        /* 马里奥装饰元素 */
+        .mario-cloud {
+            position: absolute;
+            width: 60px;
+            height: 30px;
+            background-color: white;
+            border-radius: 50%;
+            box-shadow: 0 5px 0 #dddddd;
+            z-index: 1;
+        }
+
+        .mario-cloud::before,
+        .mario-cloud::after {
+            content: '';
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+        }
+
+        .mario-cloud::before {
+            width: 30px;
+            height: 30px;
+            top: -10px;
+            left: 10px;
+        }
+
+        .mario-cloud::after {
+            width: 30px;
+            height: 30px;
+            top: -8px;
+            left: 25px;
+        }
+
+        .mario-coin {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: var(--mario-yellow);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px var(--mario-yellow);
+            color: var(--mario-brown);
+            font-weight: bold;
+            font-size: 1.2rem;
+            animation: spin 4s infinite linear, float 2s infinite ease-in-out;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 背景图案 -->
+        <div class="bg-pattern"></div>
+        
+        <!-- 顶部状态栏 -->
+        <div class="status-bar">
+            <div class="status-bar-time">16:15</div>
+            <div class="status-bar-icons">
+                <i class="fas fa-signal"></i>
+                <span>5G</span>
+                <i class="fas fa-battery-half"></i>
+                <span>78%</span>
+            </div>
+        </div>
+
+        <!-- 马里奥风格的装饰元素 -->
+        <div class="mario-cloud" style="top: 80px; right: 30px; animation: float 8s infinite;"></div>
+        <div class="mario-cloud" style="top: 120px; left: 50px; animation: float 10s infinite 1s;"></div>
+        <div class="mario-coin" style="top: 20px; right: 20px;">M</div>
+        <div class="mario-star" style="bottom: 200px; left: 30px;"></div>
+
+        <!-- 顶部标题区域 -->
+        <div class="header-area">
+            <!-- 顶部标题栏 -->
+            <div class="top-header">
+                <h1 class="app-title">动态广场</h1>
+                <div class="action-buttons">
+                    <div class="action-button">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="action-button">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 动态内容区域 -->
+        <div class="moments-container">
+            <!-- 动态卡片1 -->
+            <div class="moment-card">
+                <div class="moment-header">
+                    <img src="https://i.pravatar.cc/150?img=3" alt="用户头像" class="avatar">
+                    <div class="user-info">
+                        <div class="user-name">小王</div>
+                        <div class="post-time"><i class="far fa-clock"></i> 2小时前</div>
+                    </div>
+                </div>
+                <div class="moment-content">
+                    <div class="moment-text collapsed">
+                        今天刷新了跑步记录！使用POLY手环记录了10公里的跑步数据，心率保持在健康区间，真是太棒了！下一个目标是半程马拉松，正在制定训练计划，每周增加2公里的训练量。大家有什么好的训练建议吗？#跑步日记 #运动健康 #POLY手环
+                    </div>
+                    <div class="read-more">阅读更多</div>
+                    <div class="image-gallery">
+                        <div class="gallery-item">
+                            <img src="https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=800&auto=format&fit=crop" alt="运动照片">
+                        </div>
+                        <div class="gallery-item">
+                            <img src="https://images.unsplash.com/photo-1534258936925-c58bed479fcb?w=800&auto=format&fit=crop" alt="运动数据">
+                        </div>
+                        <div class="gallery-item">
+                            <img src="https://images.unsplash.com/photo-1515238152791-8216bfdf89a7?w=800&auto=format&fit=crop" alt="跑步路线">
+                        </div>
+                    </div>
+                </div>
+                <div class="moment-actions">
+                    <div class="action-item like" data-likes="24">
+                        <i class="far fa-heart"></i>
+                        <span>24</span>
+                    </div>
+                    <div class="action-item" onclick="toggleComments(this)">
+                        <i class="far fa-comment"></i>
+                        <span>8</span>
+                    </div>
+                    <div class="action-item">
+                        <i class="far fa-share-square"></i>
+                        <span>3</span>
+                    </div>
+                </div>
+                <div class="comment-section">
+                    <div class="comment-item">
+                        <img src="https://i.pravatar.cc/150?img=8" alt="评论者头像" class="comment-avatar">
+                        <div class="comment-content">
+                            <span class="commenter-name">张运动达人</span>
+                            <div class="comment-text">建议每周最多增加不超过10%的距离，避免受伤。加油！</div>
+                        </div>
+                    </div>
+                    <div class="comment-item">
+                        <img src="https://i.pravatar.cc/150?img=12" alt="评论者头像" class="comment-avatar">
+                        <div class="comment-content">
+                            <span class="commenter-name">POLY手环粉丝</span>
+                            <div class="comment-text">可以尝试间歇训练，效果很好。POLY手环的间歇训练模式很实用！</div>
+                        </div>
+                    </div>
+                    <div class="comment-form">
+                        <input type="text" class="comment-input" placeholder="写下你的评论...">
+                        <button class="comment-submit"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 动态卡片2 -->
+            <div class="moment-card">
+                <div class="moment-header">
+                    <img src="https://i.pravatar.cc/150?img=5" alt="用户头像" class="avatar">
+                    <div class="user-info">
+                        <div class="user-name">小红的健身日记</div>
+                        <div class="post-time"><i class="far fa-clock"></i> 4小时前</div>
+                    </div>
+                </div>
+                <div class="moment-content">
+                    <div class="moment-text">
+                        完成本月健身目标啦！💪 POLY手环真的太给力了，帮我完整追踪了所有锻炼数据，让我可以清楚地看到自己的进步。
+                    </div>
+                    <div class="image-gallery">
+                        <div class="gallery-item single">
+                            <img src="https://images.unsplash.com/photo-1599058917765-a780eda07a3e?w=1200&auto=format&fit=crop" alt="健身照片">
+                        </div>
+                    </div>
+                </div>
+                <div class="moment-actions">
+                    <div class="action-item like" data-likes="45">
+                        <i class="far fa-heart"></i>
+                        <span>45</span>
+                    </div>
+                    <div class="action-item" onclick="toggleComments(this)">
+                        <i class="far fa-comment"></i>
+                        <span>12</span>
+                    </div>
+                    <div class="action-item">
+                        <i class="far fa-share-square"></i>
+                        <span>6</span>
+                    </div>
+                </div>
+                <div class="comment-section">
+                    <div class="comment-item">
+                        <img src="https://i.pravatar.cc/150?img=10" alt="评论者头像" class="comment-avatar">
+                        <div class="comment-content">
+                            <span class="commenter-name">健身房教练</span>
+                            <div class="comment-text">姿势很标准！继续保持👍</div>
+                        </div>
+                    </div>
+                    <div class="comment-form">
+                        <input type="text" class="comment-input" placeholder="写下你的评论...">
+                        <button class="comment-submit"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 动态卡片3 - 马里奥主题 -->
+            <div class="moment-card">
+                <div class="moment-header">
+                    <img src="https://i.pravatar.cc/150?img=7" alt="用户头像" class="avatar">
+                    <div class="user-info">
+                        <div class="user-name">游戏爱好者张小华</div>
+                        <div class="post-time"><i class="far fa-clock"></i> 昨天</div>
+                    </div>
+                </div>
+                <div class="moment-content">
+                    <div class="moment-text collapsed">
+                        太兴奋了！POLY手环刚刚推出了"马里奥冒险"游戏模式！🍄👑 你可以通过实际运动来控制游戏中的马里奥角色，收集金币、踩扁蘑菇怪。每走1000步就能解锁一个新关卡，太有趣了！我已经解锁了3个关卡，大家快来加我好友一起玩吧~ #POLY游戏 #马里奥冒险 #边运动边游戏
+                    </div>
+                    <div class="read-more">阅读更多</div>
+                    <div class="image-gallery">
+                        <div class="gallery-item large">
+                            <img src="https://www.nintendo.com/sg/switch/feature/marioodyssey/assets/switch/mobile-hero-img01.jpg" alt="马里奥游戏截图">
+                        </div>
+                    </div>
+                </div>
+                <div class="moment-actions">
+                    <div class="action-item like" data-likes="89">
+                        <i class="far fa-heart"></i>
+                        <span>89</span>
+                    </div>
+                    <div class="action-item" onclick="toggleComments(this)">
+                        <i class="far fa-comment"></i>
+                        <span>26</span>
+                    </div>
+                    <div class="action-item">
+                        <i class="far fa-share-square"></i>
+                        <span>15</span>
+                    </div>
+                </div>
+                <div class="comment-section">
+                    <div class="comment-item">
+                        <img src="https://i.pravatar.cc/150?img=15" alt="评论者头像" class="comment-avatar">
+                        <div class="comment-content">
+                            <span class="commenter-name">马里奥粉丝</span>
+                            <div class="comment-text">这个功能也太酷了吧！已经下单POLY手环了！</div>
+                        </div>
+                    </div>
+                    <div class="comment-item">
+                        <img src="https://i.pravatar.cc/150?img=20" alt="评论者头像" class="comment-avatar">
+                        <div class="comment-content">
+                            <span class="commenter-name">运动游戏控</span>
+                            <div class="comment-text">我已经解锁了5个关卡，碰到库巴boss了！</div>
+                        </div>
+                    </div>
+                    <div class="comment-item">
+                        <img src="https://i.pravatar.cc/150?img=22" alt="评论者头像" class="comment-avatar">
+                        <div class="comment-content">
+                            <span class="commenter-name">科技评测员</span>
+                            <div class="comment-text">POLY的游戏化运动理念真的很赞，让运动变得有趣多了！</div>
+                        </div>
+                    </div>
+                    <div class="comment-form">
+                        <input type="text" class="comment-input" placeholder="写下你的评论...">
+                        <button class="comment-submit"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 发布动态区域 -->
+        <div class="post-composer">
+            <div class="composer-header">
+                <img src="https://i.pravatar.cc/150?img=1" alt="我的头像" class="composer-avatar">
+                <input type="text" class="composer-input" placeholder="分享你的动态...">
+            </div>
+            <div class="composer-actions">
+                <div class="composer-tools">
+                    <div class="composer-tool"><i class="fas fa-image"></i></div>
+                    <div class="composer-tool"><i class="fas fa-video"></i></div>
+                    <div class="composer-tool"><i class="fas fa-map-marker-alt"></i></div>
+                </div>
+                <button class="post-btn">发布</button>
+            </div>
+        </div>
+        
+        <!-- 图片预览弹窗 -->
+        <div class="image-preview-overlay">
+            <div class="close-preview"><i class="fas fa-times"></i></div>
+            <img src="" alt="预览图片" class="preview-image">
+        </div>
+        
+        <!-- 底部导航栏 -->
+        <div class="bottom-nav">
+            <a href="polyplay-b.html" class="nav-item">
+                <div class="icon-bg">
+                    <i class="fas fa-home"></i>
+                </div>
+                <span>HOME</span>
+            </a>
+            <a href="moments-b.html" class="nav-item active">
+                <div class="icon-bg">
+                    <i class="fas fa-stream"></i>
+                </div>
+                <span>动态</span>
+            </a>
+            <a href="chat-b.html" class="nav-item">
+                <div class="icon-bg">
+                    <i class="fas fa-comment"></i>
+                </div>
+                <span>聊天</span>
+            </a>
+            <a href="profile-b.html" class="nav-item">
+                <div class="icon-bg">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span>我的</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // 展开收起文本
+        document.querySelectorAll('.read-more').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const textElement = this.previousElementSibling;
+                if (textElement.classList.contains('collapsed')) {
+                    textElement.classList.remove('collapsed');
+                    textElement.classList.add('expanded');
+                    this.textContent = '收起';
+                } else {
+                    textElement.classList.add('collapsed');
+                    textElement.classList.remove('expanded');
+                    this.textContent = '阅读更多';
+                }
+            });
+        });
+        
+        // 切换评论区显示
+        function toggleComments(element) {
+            const commentSection = element.closest('.moment-card').querySelector('.comment-section');
+            commentSection.classList.toggle('active');
+        }
+        
+        // 点赞功能
+        document.querySelectorAll('.action-item.like').forEach(likeBtn => {
+            likeBtn.addEventListener('click', function() {
+                const likeCount = this.querySelector('span');
+                const icon = this.querySelector('i');
+                if (icon.classList.contains('far')) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    likeCount.textContent = parseInt(likeCount.textContent) + 1;
+                } else {
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                    likeCount.textContent = parseInt(likeCount.textContent) - 1;
+                }
+            });
+        });
+        
+        // 图片预览
+        document.querySelectorAll('.gallery-item img').forEach(img => {
+            img.addEventListener('click', function() {
+                const previewOverlay = document.querySelector('.image-preview-overlay');
+                const previewImage = document.querySelector('.preview-image');
+                previewImage.src = this.src;
+                previewOverlay.classList.add('active');
+            });
+        });
+        
+        // 关闭预览
+        document.querySelector('.close-preview').addEventListener('click', function() {
+            document.querySelector('.image-preview-overlay').classList.remove('active');
+        });
+        // 点赞功能
+        document.querySelectorAll('.action-item:nth-child(1)').forEach(likeBtn => {
+            likeBtn.addEventListener('click', function() {
+                this.classList.toggle('like');
+                const countSpan = this.querySelector('span');
+                let count = parseInt(countSpan.textContent);
+                
+                if (this.classList.contains('like')) {
+                    countSpan.textContent = count + 1;
+                } else {
+                    countSpan.textContent = count - 1;
+                }
+            });
+        });
+        
+        // 图片全屏预览
+        const overlay = document.querySelector('.image-preview-overlay');
+        const previewImg = document.querySelector('.preview-image');
+        const closeBtn = document.querySelector('.close-preview');
+        
+        document.querySelectorAll('.gallery-item').forEach(galleryItem => {
+            galleryItem.addEventListener('click', function() {
+                const imgSrc = this.querySelector('img').src;
+                previewImg.src = imgSrc;
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+        });
+        
+        closeBtn.addEventListener('click', function() {
+            overlay.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+        
+        // 马里奥云朵和金币动画
+        const clouds = document.querySelectorAll('.mario-cloud');
+        clouds.forEach(cloud => {
+            setInterval(() => {
+                cloud.style.transform = `translateX(${Math.sin(Date.now() / 2000) * 20}px)`;
+            }, 100);
+        });
+        
+        // 导航项目悬停效果
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                if (!this.classList.contains('active')) {
+                    this.querySelector('.icon-bg').style.animation = 'bounce 0.5s';
+                }
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('active')) {
+                    this.querySelector('.icon-bg').style.animation = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html> 
