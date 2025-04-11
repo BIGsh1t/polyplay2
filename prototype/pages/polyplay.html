@@ -550,6 +550,44 @@
         .friends-leaderboard::-webkit-scrollbar {
             display: none;
         }
+        
+        /* 隐藏所有滚动条 */
+        ::-webkit-scrollbar {
+            width: 0 !important;
+            height: 0 !important;
+            display: none !important;
+        }
+        
+        * {
+            scrollbar-width: none !important; /* Firefox */
+            -ms-overflow-style: none !important; /* IE and Edge */
+        }
+        
+        html, body {
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        /* 针对常见容器元素隐藏滚动条 */
+        div, section, main, article, aside, nav, 
+        .container, .content, .wrapper, .section, 
+        .content-container, .games-container {
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+        
+        /* 允许滚动但隐藏滚动条的元素 */
+        .scrollable {
+            overflow-y: auto !important;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+        
+        .scrollable::-webkit-scrollbar {
+            width: 0 !important;
+            height: 0 !important;
+            display: none !important;
+        }
     </style>
 </head>
 <body>

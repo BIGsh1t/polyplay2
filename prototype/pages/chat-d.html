@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POLYPLAY - 聊天中心 (Marvie风格)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Marvie UI Kit Colors */
+            --bg-primary: #151F32;
+            --bg-secondary: #1B2639;
+            --bg-card: #222C42;
+            --accent-blue: #36B7F6;
+            --accent-purple: #725FFF;
+            --accent-pink: #FF66C4;
+            --accent-orange: #FF9349;
+            --text-primary: #FFFFFF;
+            --text-secondary: #8A97B7;
+            --text-tertiary: #576083;
+            --gradient-1: linear-gradient(135deg, #725FFF 0%, #FF66C4 100%);
+            --gradient-2: linear-gradient(135deg, #36B7F6 0%, #725FFF 100%);
+            --gradient-3: linear-gradient(135deg, #FF66C4 0%, #FF9349 100%);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.25);
+            --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.3);
+            --border-radius-sm: 10px;
+            --border-radius-md: 16px;
+            --border-radius-lg: 22px;
+            --border-radius-xl: 28px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 414px;
+            margin: 0 auto;
+            position: relative;
+            background-color: var(--bg-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding-bottom: 90px;
+        }
+        
+        /* Status Bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: transparent;
+            color: var(--text-primary);
+            font-size: 12px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            max-width: 414px;
+            z-index: 100;
+        }
+        
+        .status-bar .time {
+            font-weight: 600;
+        }
+        
+        .status-bar .icons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        /* Header */
+        .header {
+            margin-top: 40px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-button {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--border-radius-md);
+            background: var(--bg-secondary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-primary);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: var(--bg-secondary);
+            margin: 0 20px 20px;
+            border-radius: var(--border-radius-lg);
+            padding: 5px;
+            position: relative;
+        }
+        
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px 0;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            color: var(--text-primary);
+        }
+        
+        .tab-slider {
+            position: absolute;
+            height: 100%;
+            border-radius: var(--border-radius-md);
+            transition: all 0.3s ease;
+            top: 0;
+            left: 0;
+            width: 33.333%;
+            background: var(--bg-card);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        /* Content */
+        .content {
+            padding: 0 20px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Chat Item */
+        .chat-item {
+            display: flex;
+            align-items: center;
+            background: var(--bg-card);
+            border-radius: var(--border-radius-lg);
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .chat-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            margin-right: 15px;
+            position: relative;
+        }
+        
+        .chat-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .chat-avatar.online::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #4CD964;
+            border-radius: 50%;
+            bottom: 3px;
+            right: 3px;
+            border: 2px solid var(--bg-card);
+        }
+        
+        .chat-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        
+        .chat-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text-primary);
+        }
+        
+        .chat-time {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+        
+        .chat-preview {
+            color: var(--text-secondary);
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .chat-badge {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent-pink);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+        
+        /* Friend Item */
+        .friend-item {
+            display: flex;
+            align-items: center;
+            background: var(--bg-card);
+            border-radius: var(--border-radius-lg);
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .friend-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .friend-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            margin-right: 15px;
+            position: relative;
+        }
+        
+        .friend-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .friend-avatar.online::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #4CD964;
+            border-radius: 50%;
+            bottom: 3px;
+            right: 3px;
+            border: 2px solid var(--bg-card);
+        }
+        
+        .friend-info {
+            flex: 1;
+            min-width: 0;
+            margin-right: 15px;
+        }
+        
+        .friend-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+        
+        .friend-status {
+            color: var(--text-tertiary);
+            font-size: 13px;
+        }
+        
+        .friend-status.online {
+            color: var(--accent-blue);
+        }
+        
+        .friend-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .friend-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--border-radius-md);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .friend-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .message-btn {
+            background: var(--gradient-2);
+        }
+        
+        .game-btn {
+            background: var(--gradient-3);
+        }
+        
+        /* Notification Item */
+        .notification-item {
+            background: var(--bg-card);
+            border-radius: var(--border-radius-lg);
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: flex-start;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .notification-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .notification-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--border-radius-md);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            color: white;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        
+        .achievement-icon {
+            background: var(--gradient-3);
+        }
+        
+        .friend-icon {
+            background: var(--gradient-1);
+        }
+        
+        .game-icon {
+            background: var(--gradient-2);
+        }
+        
+        .event-icon {
+            background: linear-gradient(135deg, #4CD964 0%, #36B7F6 100%);
+        }
+        
+        .notification-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .notification-title {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+        
+        .notification-desc {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 6px;
+            line-height: 1.5;
+        }
+        
+        .notification-time {
+            color: var(--text-tertiary);
+            font-size: 12px;
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 414px;
+            display: flex;
+            justify-content: space-around;
+            padding: 16px 10px;
+            background: var(--bg-secondary);
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            z-index: 50;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active .nav-icon {
+            background: var(--gradient-1);
+            color: white;
+            transform: translateY(-10px);
+            box-shadow: 0 4px 10px rgba(114, 95, 255, 0.4);
+        }
+        
+        .nav-text {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-tertiary);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active .nav-text {
+            color: var(--text-primary);
+        }
+        
+        /* Effects */
+        .blob-effect {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+        }
+        
+        .blob-top-right {
+            top: -150px;
+            right: -150px;
+            background: rgba(114, 95, 255, 0.1);
+        }
+        
+        .blob-bottom-left {
+            bottom: 150px;
+            left: -150px;
+            background: rgba(255, 102, 196, 0.1);
+        }
+    </style>
+
+<style>
+/* 隐藏所有滚动条 */
+::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+}
+
+* {
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* IE and Edge */
+}
+
+html, body {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* 针对常见容器元素隐藏滚动条 */
+div, section, main, article, aside, nav, 
+.container, .content, .wrapper, .section, 
+.content-container, .achievements-list,
+.history-list, .moments-container, .chat-container,
+.profile-container, .comments-section {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+/* 允许滚动但隐藏滚动条的元素 */
+.scrollable {
+    overflow-y: auto !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+.scrollable::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+}
+</style>
+</head>
+<body>
+    <div class="container">
+        <!-- Background Blobs -->
+        <div class="blob-effect blob-top-right"></div>
+        <div class="blob-effect blob-bottom-left"></div>
+        
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="time">10:25</div>
+            <div class="icons">
+                <i class="fas fa-wifi"></i>
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-battery-three-quarters"></i>
+            </div>
+        </div>
+        
+        <!-- Header -->
+        <div class="header">
+            <h1 class="header-title">聊天中心</h1>
+            <div class="header-actions">
+                <div class="action-button">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div class="action-button">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" data-tab="chats">聊天</div>
+            <div class="tab" data-tab="friends">好友</div>
+            <div class="tab" data-tab="notifications">通知</div>
+            <div class="tab-slider"></div>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <!-- Chats Tab -->
+            <div class="tab-content active" id="chats">
+                <div class="chat-item">
+                    <div class="chat-avatar online">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="头像">
+                    </div>
+                    <div class="chat-info">
+                        <div class="chat-header">
+                            <div class="chat-name">小红</div>
+                            <div class="chat-time">10:15</div>
+                        </div>
+                        <div class="chat-preview">今晚要不要一起玩《马里奥赛车》？</div>
+                    </div>
+                    <div class="chat-badge">2</div>
+                </div>
+                
+                <div class="chat-item">
+                    <div class="chat-avatar">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="头像">
+                    </div>
+                    <div class="chat-info">
+                        <div class="chat-header">
+                            <div class="chat-name">阿明</div>
+                            <div class="chat-time">昨天</div>
+                        </div>
+                        <div class="chat-preview">我解锁了新的游戏成就，快来看看！</div>
+                    </div>
+                </div>
+                
+                <div class="chat-item">
+                    <div class="chat-avatar online">
+                        <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="头像">
+                    </div>
+                    <div class="chat-info">
+                        <div class="chat-header">
+                            <div class="chat-name">贝贝</div>
+                            <div class="chat-time">昨天</div>
+                        </div>
+                        <div class="chat-preview">谢谢你的游戏推荐，真的很好玩！</div>
+                    </div>
+                </div>
+                
+                <div class="chat-item">
+                    <div class="chat-avatar">
+                        <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="头像">
+                    </div>
+                    <div class="chat-info">
+                        <div class="chat-header">
+                            <div class="chat-name">小王</div>
+                            <div class="chat-time">周一</div>
+                        </div>
+                        <div class="chat-preview">周末健身挑战赛的事情，你准备好了吗？</div>
+                    </div>
+                </div>
+                
+                <div class="chat-item">
+                    <div class="chat-avatar">
+                        <img src="https://randomuser.me/api/portraits/women/22.jpg" alt="头像">
+                    </div>
+                    <div class="chat-info">
+                        <div class="chat-header">
+                            <div class="chat-name">丽丽</div>
+                            <div class="chat-time">周一</div>
+                        </div>
+                        <div class="chat-preview">加油！你一定能突破自己的记录！</div>
+                    </div>
+                    <div class="chat-badge">1</div>
+                </div>
+            </div>
+            
+            <!-- Friends Tab -->
+            <div class="tab-content" id="friends">
+                <div class="friend-item">
+                    <div class="friend-avatar online">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="好友头像">
+                    </div>
+                    <div class="friend-info">
+                        <div class="friend-name">小红</div>
+                        <div class="friend-status online">在线 - 正在玩《马里奥赛车》</div>
+                    </div>
+                    <div class="friend-actions">
+                        <div class="friend-btn message-btn">
+                            <i class="fas fa-comment"></i>
+                        </div>
+                        <div class="friend-btn game-btn">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="friend-item">
+                    <div class="friend-avatar online">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="好友头像">
+                    </div>
+                    <div class="friend-info">
+                        <div class="friend-name">阿明</div>
+                        <div class="friend-status online">在线 - 空闲</div>
+                    </div>
+                    <div class="friend-actions">
+                        <div class="friend-btn message-btn">
+                            <i class="fas fa-comment"></i>
+                        </div>
+                        <div class="friend-btn game-btn">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="friend-item">
+                    <div class="friend-avatar">
+                        <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="好友头像">
+                    </div>
+                    <div class="friend-info">
+                        <div class="friend-name">贝贝</div>
+                        <div class="friend-status">离线 - 2小时前在线</div>
+                    </div>
+                    <div class="friend-actions">
+                        <div class="friend-btn message-btn">
+                            <i class="fas fa-comment"></i>
+                        </div>
+                        <div class="friend-btn game-btn">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="friend-item">
+                    <div class="friend-avatar">
+                        <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="好友头像">
+                    </div>
+                    <div class="friend-info">
+                        <div class="friend-name">小王</div>
+                        <div class="friend-status">离线 - 昨天在线</div>
+                    </div>
+                    <div class="friend-actions">
+                        <div class="friend-btn message-btn">
+                            <i class="fas fa-comment"></i>
+                        </div>
+                        <div class="friend-btn game-btn">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Notifications Tab -->
+            <div class="tab-content" id="notifications">
+                <div class="notification-item">
+                    <div class="notification-icon achievement-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="notification-info">
+                        <div class="notification-title">新成就解锁</div>
+                        <div class="notification-desc">恭喜！你已解锁"健身大师"成就，连续30天完成健身游戏。</div>
+                        <div class="notification-time">今天 10:25</div>
+                    </div>
+                </div>
+                
+                <div class="notification-item">
+                    <div class="notification-icon friend-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="notification-info">
+                        <div class="notification-title">好友请求</div>
+                        <div class="notification-desc">大雄想添加你为好友</div>
+                        <div class="notification-time">昨天 18:40</div>
+                    </div>
+                </div>
+                
+                <div class="notification-item">
+                    <div class="notification-icon game-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <div class="notification-info">
+                        <div class="notification-title">游戏邀请</div>
+                        <div class="notification-desc">小红邀请你一起玩《马里奥赛车》多人竞速</div>
+                        <div class="notification-time">昨天 15:20</div>
+                    </div>
+                </div>
+                
+                <div class="notification-item">
+                    <div class="notification-icon event-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="notification-info">
+                        <div class="notification-title">活动提醒</div>
+                        <div class="notification-desc">周末健身挑战赛即将开始，记得准时参加！</div>
+                        <div class="notification-time">2天前</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="polyplay-d.html" class="nav-item">
+                <div class="nav-icon">
+                    <i class="fas fa-gamepad"></i>
+                </div>
+                <span class="nav-text">游戏</span>
+            </a>
+            <a href="moments-d.html" class="nav-item">
+                <div class="nav-icon">
+                    <i class="fas fa-stream"></i>
+                </div>
+                <span class="nav-text">动态</span>
+            </a>
+            <a href="chat-d.html" class="nav-item active">
+                <div class="nav-icon">
+                    <i class="fas fa-comment-dots"></i>
+                </div>
+                <span class="nav-text">聊天</span>
+            </a>
+            <a href="profile-d.html" class="nav-item">
+                <div class="nav-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span class="nav-text">我的</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Set current time in status bar
+        function updateTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.querySelector('.status-bar .time').textContent = `${hours}:${minutes}`;
+        }
+        
+        updateTime();
+        setInterval(updateTime, 60000);
+        
+        // Tab switching
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const tabSlider = document.querySelector('.tab-slider');
+        
+        tabs.forEach((tab, index) => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and contents
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to current tab and content
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+                
+                // Move slider
+                tabSlider.style.left = `${index * 33.333}%`;
+            });
+        });
+        
+        // Chat item click event
+        document.querySelectorAll('.chat-item').forEach(item => {
+            item.addEventListener('click', function() {
+                alert('跳转到聊天详情页面');
+            });
+        });
+        
+        // Friend button click events
+        document.querySelectorAll('.friend-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                if (this.classList.contains('message-btn')) {
+                    alert('打开聊天窗口');
+                } else {
+                    alert('邀请游戏');
+                }
+            });
+        });
+        
+        // Notification item click event
+        document.querySelectorAll('.notification-item').forEach(item => {
+            item.addEventListener('click', function() {
+                alert('查看通知详情');
+            });
+        });
+    </script>
+</body>
+</html> 

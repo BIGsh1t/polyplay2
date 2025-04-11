@@ -1,0 +1,71 @@
+/* 全局隐藏滚动条样式 */
+
+/* 隐藏webkit浏览器的滚动条 */
+::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+    background: transparent !important;
+}
+
+/* 通用选择器应用到所有元素 */
+* {
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* IE and Edge */
+    -webkit-tap-highlight-color: transparent; /* 移除iOS点击高亮 */
+}
+
+/* HTML和BODY元素设置 */
+html, body {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important; /* iOS惯性滚动 */
+    overscroll-behavior: none !important; /* 防止下拉刷新 */
+    touch-action: manipulation !important; /* 减少触摸延迟 */
+    max-width: 100%;
+    position: relative;
+}
+
+/* 针对常见容器元素隐藏滚动条 */
+div, section, main, article, aside, nav, 
+.container, .content, .wrapper, .section,
+.content-container, .main-container,
+.scroll-container, .page-content,
+.profile-container, .moments-container,
+.chat-container, .achievements-list,
+.history-list, .comments-section,
+.post-container, .game-list {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    max-width: 100%;
+}
+
+/* 特别针对常见的可滚动容器 */
+.scroll-y, .scrollable, .overflow-auto, .overflow-y-auto {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+/* 针对滚动容器的webkit滚动条 */
+.scroll-y::-webkit-scrollbar, 
+.scrollable::-webkit-scrollbar, 
+.overflow-auto::-webkit-scrollbar, 
+.overflow-y-auto::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* 防止内容水平溢出 */
+img, video, canvas, iframe {
+    max-width: 100%;
+}
+
+/* iOS触摸体验优化 */
+a, button, .clickable {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+} 

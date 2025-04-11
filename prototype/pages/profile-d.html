@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POLYPLAY - 个人资料 (Marvie风格)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 隐藏所有滚动条 */
+        ::-webkit-scrollbar {
+            width: 0 !important;
+            height: 0 !important;
+            display: none !important;
+        }
+        
+        * {
+            scrollbar-width: none !important; /* Firefox */
+            -ms-overflow-style: none !important; /* IE and Edge */
+        }
+        
+        html, body {
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        /* 针对常见容器元素隐藏滚动条 */
+        div, section, main, article, aside, nav, 
+        .container, .content, .wrapper, .section, 
+        .content-container, .profile-container,
+        .achievements-list, .history-list {
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+        
+        /* 允许滚动但隐藏滚动条的元素 */
+        .scrollable {
+            overflow-y: auto !important;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+        
+        .scrollable::-webkit-scrollbar {
+            width: 0 !important;
+            height: 0 !important;
+            display: none !important;
+        }
+        
+        :root {
+            /* Marvie UI Kit Colors */
+            --bg-primary: #151F32;
+            --bg-secondary: #1B2639;
+            --bg-card: #222C42;
+            --accent-blue: #36B7F6;
+            --accent-purple: #725FFF;
+            --accent-pink: #FF66C4;
+            --accent-orange: #FF9349;
+            --text-primary: #FFFFFF;
+            --text-secondary: #8A97B7;
+            --text-tertiary: #576083;
+            --gradient-1: linear-gradient(135deg, #725FFF 0%, #FF66C4 100%);
+            --gradient-2: linear-gradient(135deg, #36B7F6 0%, #725FFF 100%);
+            --gradient-3: linear-gradient(135deg, #FF66C4 0%, #FF9349 100%);
+            --gradient-4: linear-gradient(135deg, #4CD964 0%, #36B7F6 100%);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.25);
+            --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.3);
+            --border-radius-sm: 10px;
+            --border-radius-md: 16px;
+            --border-radius-lg: 22px;
+            --border-radius-xl: 28px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 414px;
+            margin: 0 auto;
+            position: relative;
+            background-color: var(--bg-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding-bottom: 90px;
+        }
+        
+        /* Status Bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: transparent;
+            color: var(--text-primary);
+            font-size: 12px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            max-width: 414px;
+            z-index: 100;
+        }
+        
+        .status-bar .time {
+            font-weight: 600;
+        }
+        
+        .status-bar .icons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        /* Profile Header */
+        .profile-header {
+            padding-top: 60px;
+            padding-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 150px;
+            background: var(--gradient-1);
+            z-index: -1;
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid var(--bg-primary);
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .profile-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        
+        .profile-id {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .profile-stats {
+            display: flex;
+            width: 100%;
+            justify-content: space-around;
+            max-width: 350px;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        /* Content */
+        .content {
+            padding: 20px;
+        }
+        
+        /* Section */
+        .section {
+            margin-bottom: 25px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--bg-secondary);
+        }
+        
+        .section-more {
+            color: var(--accent-blue);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .section-more:hover {
+            transform: translateX(3px);
+        }
+        
+        /* Wearable Card */
+        .wearable-card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius-lg);
+            padding: 15px;
+            display: flex;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .wearable-image {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-2);
+            border-radius: var(--border-radius-md);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            overflow: hidden;
+        }
+        
+        .wearable-image img {
+            width: 70%;
+            height: auto;
+        }
+        
+        .wearable-info {
+            flex: 1;
+        }
+        
+        .wearable-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: var(--text-primary);
+        }
+        
+        .wearable-status {
+            display: flex;
+            align-items: center;
+            margin-bottom: 3px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #4CD964;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .status-text {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+        
+        .wearable-meta {
+            display: flex;
+            margin-bottom: 8px;
+        }
+        
+        .wearable-meta-item {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .wearable-meta-item i {
+            margin-right: 5px;
+        }
+        
+        .battery-wrap {
+            display: flex;
+            align-items: center;
+        }
+        
+        .battery-icon {
+            color: #4CD964;
+            margin-right: 5px;
+        }
+        
+        .battery-text {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        
+        /* Achievements */
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .achievement-card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius-lg);
+            padding: 15px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .achievement-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--border-radius-md);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 12px;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .achievement-icon.gamepad {
+            background: var(--gradient-1);
+        }
+        
+        .achievement-icon.fitness {
+            background: var(--gradient-2);
+        }
+        
+        .achievement-icon.speed {
+            background: var(--gradient-3);
+        }
+        
+        .achievement-icon.social {
+            background: var(--gradient-4);
+        }
+        
+        .achievement-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        
+        .achievement-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+        
+        .progress-wrap {
+            height: 5px;
+            background: var(--bg-secondary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            border-radius: 3px;
+        }
+        
+        .progress-bar.gamepad {
+            background: var(--gradient-1);
+            width: 65%;
+        }
+        
+        .progress-bar.fitness {
+            background: var(--gradient-2);
+            width: 85%;
+        }
+        
+        .progress-bar.speed {
+            background: var(--gradient-3);
+            width: 42%;
+        }
+        
+        .progress-bar.social {
+            background: var(--gradient-4);
+            width: 90%;
+        }
+        
+        /* History */
+        .history-list {
+            background: var(--bg-card);
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .history-item {
+            display: flex;
+            padding: 15px;
+            border-bottom: 1px solid rgba(90, 151, 183, 0.1);
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: var(--border-radius-md);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            color: white;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        
+        .history-icon.gamepad {
+            background: var(--gradient-1);
+        }
+        
+        .history-icon.fitness {
+            background: var(--gradient-2);
+        }
+        
+        .history-icon.trophy {
+            background: var(--gradient-3);
+        }
+        
+        .history-icon.post {
+            background: var(--gradient-4);
+        }
+        
+        .history-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .history-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        
+        .history-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .history-points {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+            color: var(--accent-blue);
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .history-points i {
+            font-size: 10px;
+            margin-right: 3px;
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 414px;
+            display: flex;
+            justify-content: space-around;
+            padding: 16px 10px;
+            background: var(--bg-secondary);
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            z-index: 50;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active .nav-icon {
+            background: var(--gradient-1);
+            color: white;
+            transform: translateY(-10px);
+            box-shadow: 0 4px 10px rgba(114, 95, 255, 0.4);
+        }
+        
+        .nav-text {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-tertiary);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active .nav-text {
+            color: var(--text-primary);
+        }
+        
+        /* Effects */
+        .blob-effect {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+        }
+        
+        .blob-top-right {
+            top: -150px;
+            right: -150px;
+            background: rgba(114, 95, 255, 0.1);
+        }
+        
+        .blob-bottom-left {
+            bottom: 150px;
+            left: -150px;
+            background: rgba(255, 102, 196, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Background Blobs -->
+        <div class="blob-effect blob-top-right"></div>
+        <div class="blob-effect blob-bottom-left"></div>
+        
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="time">10:25</div>
+            <div class="icons">
+                <i class="fas fa-wifi"></i>
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-battery-three-quarters"></i>
+            </div>
+        </div>
+        
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User Avatar">
+            </div>
+            <div class="profile-name">李小雨</div>
+            <div class="profile-id">ID: POLY78342</div>
+            
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <div class="stat-value">42</div>
+                    <div class="stat-label">游戏</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">128</div>
+                    <div class="stat-label">好友</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">5680</div>
+                    <div class="stat-label">积分</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <!-- Wearable Section -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fas fa-mobile-alt"></i>
+                        我的手环
+                    </div>
+                    <div class="section-more">查看详情</div>
+                </div>
+                
+                <div class="wearable-card">
+                    <div class="wearable-image">
+                        <img src="../assets/images/ring1.png" alt="POLYPLAY Wristband">
+                    </div>
+                    <div class="wearable-info">
+                        <div class="wearable-name">POLYPLAY Pro 手环</div>
+                        <div class="wearable-status">
+                            <div class="status-dot"></div>
+                            <p class="status-text">已连接</p>
+                        </div>
+                        <div class="wearable-meta">
+                            <div class="wearable-meta-item">
+                                <i class="fas fa-sync"></i>
+                                <span>15分钟前同步</span>
+                            </div>
+                        </div>
+                        <div class="battery-wrap">
+                            <i class="fas fa-battery-three-quarters battery-icon"></i>
+                            <span class="battery-text">78%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Achievements Section -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fas fa-trophy"></i>
+                        我的成就
+                    </div>
+                    <div class="section-more">全部</div>
+                </div>
+                
+                <div class="achievements-grid">
+                    <div class="achievement-card">
+                        <div class="achievement-icon gamepad">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div class="achievement-name">游戏大师</div>
+                        <div class="achievement-desc">完成100个游戏</div>
+                        <div class="progress-wrap">
+                            <div class="progress-bar gamepad"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="achievement-card">
+                        <div class="achievement-icon fitness">
+                            <i class="fas fa-running"></i>
+                        </div>
+                        <div class="achievement-name">健身达人</div>
+                        <div class="achievement-desc">累计运动30小时</div>
+                        <div class="progress-wrap">
+                            <div class="progress-bar fitness"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="achievement-card">
+                        <div class="achievement-icon speed">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="achievement-name">急速之王</div>
+                        <div class="achievement-desc">时速达到15km/h</div>
+                        <div class="progress-wrap">
+                            <div class="progress-bar speed"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="achievement-card">
+                        <div class="achievement-icon social">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="achievement-name">社交达人</div>
+                        <div class="achievement-desc">添加50个好友</div>
+                        <div class="progress-wrap">
+                            <div class="progress-bar social"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- History Section -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fas fa-history"></i>
+                        历史记录
+                    </div>
+                    <div class="section-more">更多</div>
+                </div>
+                
+                <div class="history-list">
+                    <div class="history-item">
+                        <div class="history-icon gamepad">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div class="history-content">
+                            <div class="history-title">完成游戏"宇宙探险"</div>
+                            <div class="history-time">今天 12:45</div>
+                        </div>
+                        <div class="history-points">
+                            <span><i class="fas fa-plus"></i>150</span>
+                        </div>
+                    </div>
+                    
+                    <div class="history-item">
+                        <div class="history-icon fitness">
+                            <i class="fas fa-running"></i>
+                        </div>
+                        <div class="history-content">
+                            <div class="history-title">完成今日健身目标</div>
+                            <div class="history-time">今天 10:30</div>
+                        </div>
+                        <div class="history-points">
+                            <span><i class="fas fa-plus"></i>200</span>
+                        </div>
+                    </div>
+                    
+                    <div class="history-item">
+                        <div class="history-icon trophy">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="history-content">
+                            <div class="history-title">解锁成就"健身达人"</div>
+                            <div class="history-time">昨天 15:20</div>
+                        </div>
+                        <div class="history-points">
+                            <span><i class="fas fa-plus"></i>500</span>
+                        </div>
+                    </div>
+                    
+                    <div class="history-item">
+                        <div class="history-icon post">
+                            <i class="fas fa-pen"></i>
+                        </div>
+                        <div class="history-content">
+                            <div class="history-title">发布动态</div>
+                            <div class="history-time">昨天 11:05</div>
+                        </div>
+                        <div class="history-points">
+                            <span><i class="fas fa-plus"></i>30</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="polyplay-d.html" class="nav-item">
+                <div class="nav-icon">
+                    <i class="fas fa-gamepad"></i>
+                </div>
+                <span class="nav-text">游戏</span>
+            </a>
+            <a href="moments-d.html" class="nav-item">
+                <div class="nav-icon">
+                    <i class="fas fa-stream"></i>
+                </div>
+                <span class="nav-text">动态</span>
+            </a>
+            <a href="chat-d.html" class="nav-item">
+                <div class="nav-icon">
+                    <i class="fas fa-comment-dots"></i>
+                </div>
+                <span class="nav-text">聊天</span>
+            </a>
+            <a href="profile-d.html" class="nav-item active">
+                <div class="nav-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span class="nav-text">我的</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Set current time in status bar
+        function updateTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.querySelector('.status-bar .time').textContent = `${hours}:${minutes}`;
+        }
+        
+        updateTime();
+        setInterval(updateTime, 60000);
+    </script>
+</body>
+</html> 

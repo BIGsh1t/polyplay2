@@ -12,6 +12,44 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
+        /* 隐藏所有滚动条 */
+        ::-webkit-scrollbar {
+            width: 0 !important;
+            height: 0 !important;
+            display: none !important;
+        }
+        
+        * {
+            scrollbar-width: none !important; /* Firefox */
+            -ms-overflow-style: none !important; /* IE and Edge */
+        }
+        
+        html, body {
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        /* 针对常见容器元素隐藏滚动条 */
+        div, section, main, article, aside, nav, 
+        .container, .content, .wrapper, .section, 
+        .content-container, .moments-container {
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+        
+        /* 允许滚动但隐藏滚动条的元素 */
+        .scrollable {
+            overflow-y: auto !important;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+        
+        .scrollable::-webkit-scrollbar {
+            width: 0 !important;
+            height: 0 !important;
+            display: none !important;
+        }
+        
         :root {
             /* 马里奥风格色调色板 - 优化配色 */
             --mario-red: #E52521;
@@ -82,7 +120,6 @@
             min-height: 100vh;
             padding: 0;
             margin: 0;
-            overflow-x: hidden;
         }
         
         .container {

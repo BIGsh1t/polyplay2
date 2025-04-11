@@ -2,13 +2,14 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PolyPlay 原型设计</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Bangers&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="prototype/css/global-no-scrollbar.css">
     <style>
         :root {
             --primary: #FF6B6B;
@@ -28,6 +29,25 @@
             --mario-orange: #F37021;
             --mario-brown: #8C6239;
             --mario-bg-blue: #8ECFFD;
+            
+            /* 任天堂Switch主题颜色 */
+            --switch-red: #E60012;
+            --switch-blue: #0AB9E6;
+            --switch-gray: #414548;
+            --switch-light-gray: #E6E6E6;
+            --switch-white: #FFFFFF;
+            --switch-black: #1E1E1E;
+            
+            /* Marvie UI Kit 主题颜色 */
+            --marvie-bg-primary: #151F32;
+            --marvie-bg-secondary: #1B2639;
+            --marvie-bg-card: #222C42;
+            --marvie-accent-blue: #36B7F6;
+            --marvie-accent-purple: #725FFF;
+            --marvie-accent-pink: #FF66C4;
+            --marvie-accent-orange: #FF9349;
+            --marvie-text-primary: #FFFFFF;
+            --marvie-text-secondary: #8A97B7;
         }
         
         body {
@@ -56,6 +76,38 @@
             width: 100%;
             height: 100%;
             border: none;
+            overflow: hidden !important;
+            display: block;
+        }
+        
+        /* 隐藏滚动条样式 */
+        .hide-scrollbar {
+            scrollbar-width: none !important; /* Firefox */
+            -ms-overflow-style: none !important; /* IE and Edge */
+            overflow: hidden !important;
+        }
+        
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none !important; /* Chrome, Safari, Opera */
+            width: 0 !important;
+            height: 0 !important;
+        }
+        
+        /* 添加覆盖iframe内部滚动条的样式 */
+        .hide-scrollbar-all {
+            overflow: auto;
+        }
+        
+        /* 创建一个嵌入到iframe中的样式，覆盖所有内部滚动条 */
+        iframe.hide-scrollbar {
+            overflow: hidden;
+        }
+        
+        /* 为所有iframe注入CSS来隐藏其内容的滚动条 */
+        .scrollbar-killer-style {
+            width: 100%;
+            height: 0;
+            border: 0;
         }
         
         .phone-notch {
@@ -104,6 +156,14 @@
             background: linear-gradient(90deg, var(--mario-red), var(--mario-orange));
         }
         
+        .version-c {
+            background: linear-gradient(90deg, var(--switch-red), var(--switch-blue));
+        }
+        
+        .version-d {
+            background: linear-gradient(90deg, var(--marvie-accent-purple), var(--marvie-accent-pink));
+        }
+        
         .version-title {
             margin-top: 40px;
             margin-bottom: 20px;
@@ -123,8 +183,36 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
         
+        .prototype-container.version-c {
+            border: 12px solid var(--switch-gray);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+        
+        .prototype-container.version-c:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        .prototype-container.version-d {
+            border: 12px solid var(--marvie-bg-primary);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+        
+        .prototype-container.version-d:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        
         .phone-notch.version-b {
             background-color: #333;
+        }
+        
+        .phone-notch.version-c {
+            background-color: var(--switch-gray);
+        }
+        
+        .phone-notch.version-d {
+            background-color: var(--marvie-bg-primary);
         }
         
         .mario-title {
@@ -134,6 +222,22 @@
             -webkit-text-fill-color: transparent;
             text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
             letter-spacing: 2px;
+        }
+        
+        .switch-title {
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--switch-red), var(--switch-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 1px 1px 0px rgba(0,0,0,0.05);
+        }
+        
+        .marvie-title {
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--marvie-accent-purple), var(--marvie-accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 1px 1px 0px rgba(0,0,0,0.05);
         }
         
         /* Mario theme decorations */
@@ -211,6 +315,76 @@
             color: var(--mario-brown);
             font-weight: bold;
         }
+        
+        /* Switch theme decorations */
+        .switch-joy-con {
+            position: absolute;
+            width: 15px;
+            height: 60px;
+            border-radius: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: -1;
+        }
+        
+        .switch-joy-con-left {
+            left: -20px;
+            background-color: var(--switch-blue);
+            box-shadow: -2px 0 10px rgba(10, 185, 230, 0.3);
+        }
+        
+        .switch-joy-con-right {
+            right: -20px;
+            background-color: var(--switch-red);
+            box-shadow: 2px 0 10px rgba(230, 0, 18, 0.3);
+        }
+        
+        .switch-button {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--switch-black);
+        }
+        
+        .switch-button-left {
+            top: 15px;
+            left: 1.5px;
+        }
+        
+        .switch-button-right {
+            top: 15px;
+            right: 1.5px;
+        }
+        
+        /* Marvie theme decorations */
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 0.6; }
+        }
+        
+        .marvie-blob {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            filter: blur(30px);
+            z-index: -1;
+            animation: pulse 5s ease-in-out infinite;
+        }
+        
+        .marvie-blob-1 {
+            top: 150px;
+            right: 20%;
+            background: rgba(114, 95, 255, 0.3);
+        }
+        
+        .marvie-blob-2 {
+            bottom: 250px;
+            left: 15%;
+            background: rgba(255, 102, 196, 0.3);
+        }
     </style>
 </head>
 <body class="min-h-screen p-8">
@@ -219,6 +393,10 @@
         <div class="mario-cloud"></div>
         <div class="mario-cloud mario-cloud-2"></div>
         <div class="mario-coin"></div>
+        
+        <!-- Marvie theme decorations -->
+        <div class="marvie-blob marvie-blob-1"></div>
+        <div class="marvie-blob marvie-blob-2"></div>
         
         <h1 class="text-5xl page-title text-center mb-12">PolyPlay APP 原型设计</h1>
         
@@ -242,7 +420,7 @@
                 <h2 class="text-2xl font-semibold mb-6 page-card-title text-purple-600">POLYPLAY 页面</h2>
                 <div class="prototype-container">
                     <div class="phone-notch"></div>
-                    <iframe src="prototype/pages/polyplay.html"></iframe>
+                    <iframe src="prototype/pages/polyplay.html" class="hide-scrollbar"></iframe>
                 </div>
             </div>
             
@@ -251,7 +429,7 @@
                 <h2 class="text-2xl font-semibold mb-6 page-card-title text-purple-600">动态广场</h2>
                 <div class="prototype-container">
                     <div class="phone-notch"></div>
-                    <iframe src="prototype/pages/moments.html"></iframe>
+                    <iframe src="prototype/pages/moments.html" class="hide-scrollbar"></iframe>
                 </div>
             </div>
             
@@ -260,7 +438,7 @@
                 <h2 class="text-2xl font-semibold mb-6 page-card-title text-purple-600">聊天页面</h2>
                 <div class="prototype-container">
                     <div class="phone-notch"></div>
-                    <iframe src="prototype/pages/chat.html"></iframe>
+                    <iframe src="prototype/pages/chat.html" class="hide-scrollbar"></iframe>
                 </div>
             </div>
             
@@ -269,7 +447,7 @@
                 <h2 class="text-2xl font-semibold mb-6 page-card-title text-purple-600">个人信息</h2>
                 <div class="prototype-container">
                     <div class="phone-notch"></div>
-                    <iframe src="prototype/pages/profile.html"></iframe>
+                    <iframe src="prototype/pages/profile.html" class="hide-scrollbar"></iframe>
                 </div>
             </div>
         </div>
@@ -282,7 +460,7 @@
                 <h2 class="text-2xl font-semibold mb-6 page-card-title text-red-600 font-bangers">POLYPLAY 页面</h2>
                 <div class="prototype-container version-b">
                     <div class="phone-notch version-b"></div>
-                    <iframe src="prototype/pages/polyplay-b.html"></iframe>
+                    <iframe src="prototype/pages/polyplay-b.html" class="hide-scrollbar"></iframe>
                 </div>
             </div>
             
@@ -291,7 +469,7 @@
                 <h2 class="text-2xl font-semibold mb-6 page-card-title text-red-600 font-bangers">动态广场</h2>
                 <div class="prototype-container version-b">
                     <div class="phone-notch version-b"></div>
-                    <iframe src="prototype/pages/moments-b.html"></iframe>
+                    <iframe src="prototype/pages/moments-b.html" class="hide-scrollbar"></iframe>
                 </div>
             </div>
             
@@ -300,7 +478,7 @@
                 <h2 class="text-2xl font-semibold mb-6 page-card-title text-red-600 font-bangers">聊天页面</h2>
                 <div class="prototype-container version-b">
                     <div class="phone-notch version-b"></div>
-                    <iframe src="prototype/pages/chat-b.html"></iframe>
+                    <iframe src="prototype/pages/chat-b.html" class="hide-scrollbar"></iframe>
                 </div>
             </div>
             
@@ -309,10 +487,221 @@
                 <h2 class="text-2xl font-semibold mb-6 page-card-title text-red-600 font-bangers">个人信息</h2>
                 <div class="prototype-container version-b">
                     <div class="phone-notch version-b"></div>
-                    <iframe src="prototype/pages/profile-b.html"></iframe>
+                    <iframe src="prototype/pages/profile-b.html" class="hide-scrollbar"></iframe>
+                </div>
+            </div>
+        </div>
+        
+        <h2 class="version-title switch-title">任天堂Switch版 <span class="version-label version-c">版本C</span></h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- POLYPLAY 页面 C版本 -->
+            <div class="flex flex-col items-center page-card">
+                <h2 class="text-2xl font-semibold mb-6 page-card-title text-blue-500">POLYPLAY 页面</h2>
+                <div class="prototype-container version-c">
+                    <div class="phone-notch version-c"></div>
+                    <div class="switch-joy-con switch-joy-con-left">
+                        <div class="switch-button switch-button-left"></div>
+                    </div>
+                    <div class="switch-joy-con switch-joy-con-right">
+                        <div class="switch-button switch-button-right"></div>
+                    </div>
+                    <iframe src="prototype/pages/polyplay-c.html" class="hide-scrollbar"></iframe>
+                </div>
+            </div>
+            
+            <!-- 动态广场 C版本 -->
+            <div class="flex flex-col items-center page-card">
+                <h2 class="text-2xl font-semibold mb-6 page-card-title text-blue-500">动态广场</h2>
+                <div class="prototype-container version-c">
+                    <div class="phone-notch version-c"></div>
+                    <div class="switch-joy-con switch-joy-con-left">
+                        <div class="switch-button switch-button-left"></div>
+                    </div>
+                    <div class="switch-joy-con switch-joy-con-right">
+                        <div class="switch-button switch-button-right"></div>
+                    </div>
+                    <iframe src="prototype/pages/moments-c.html" class="hide-scrollbar"></iframe>
+                </div>
+            </div>
+            
+            <!-- 聊天页面 C版本 -->
+            <div class="flex flex-col items-center page-card">
+                <h2 class="text-2xl font-semibold mb-6 page-card-title text-blue-500">聊天页面</h2>
+                <div class="prototype-container version-c">
+                    <div class="phone-notch version-c"></div>
+                    <div class="switch-joy-con switch-joy-con-left">
+                        <div class="switch-button switch-button-left"></div>
+                    </div>
+                    <div class="switch-joy-con switch-joy-con-right">
+                        <div class="switch-button switch-button-right"></div>
+                    </div>
+                    <iframe src="prototype/pages/chat-c.html" class="hide-scrollbar"></iframe>
+                </div>
+            </div>
+            
+            <!-- 个人信息 C版本 -->
+            <div class="flex flex-col items-center page-card">
+                <h2 class="text-2xl font-semibold mb-6 page-card-title text-blue-500">个人信息</h2>
+                <div class="prototype-container version-c">
+                    <div class="phone-notch version-c"></div>
+                    <div class="switch-joy-con switch-joy-con-left">
+                        <div class="switch-button switch-button-left"></div>
+                    </div>
+                    <div class="switch-joy-con switch-joy-con-right">
+                        <div class="switch-button switch-button-right"></div>
+                    </div>
+                    <iframe src="prototype/pages/profile-c.html" class="hide-scrollbar"></iframe>
+                </div>
+            </div>
+        </div>
+        
+        <h2 class="version-title marvie-title">Marvie风格 <span class="version-label version-d">版本D</span></h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- POLYPLAY 页面 D版本 -->
+            <div class="flex flex-col items-center page-card">
+                <h2 class="text-2xl font-semibold mb-6 page-card-title text-purple-600">POLYPLAY 页面</h2>
+                <div class="prototype-container version-d">
+                    <div class="phone-notch version-d"></div>
+                    <iframe src="prototype/pages/polyplay-d.html" class="hide-scrollbar"></iframe>
+                </div>
+            </div>
+            
+            <!-- 动态广场 D版本 -->
+            <div class="flex flex-col items-center page-card">
+                <h2 class="text-2xl font-semibold mb-6 page-card-title text-purple-600">动态广场</h2>
+                <div class="prototype-container version-d">
+                    <div class="phone-notch version-d"></div>
+                    <iframe src="prototype/pages/moments-d.html" class="hide-scrollbar"></iframe>
+                </div>
+            </div>
+            
+            <!-- 聊天页面 D版本 -->
+            <div class="flex flex-col items-center page-card">
+                <h2 class="text-2xl font-semibold mb-6 page-card-title text-purple-600">聊天页面</h2>
+                <div class="prototype-container version-d">
+                    <div class="phone-notch version-d"></div>
+                    <iframe src="prototype/pages/chat-d.html" class="hide-scrollbar"></iframe>
+                </div>
+            </div>
+            
+            <!-- 个人信息 D版本 -->
+            <div class="flex flex-col items-center page-card">
+                <h2 class="text-2xl font-semibold mb-6 page-card-title text-purple-600">个人信息</h2>
+                <div class="prototype-container version-d">
+                    <div class="phone-notch version-d"></div>
+                    <iframe src="prototype/pages/profile-d.html" class="hide-scrollbar"></iframe>
                 </div>
             </div>
         </div>
     </div>
+    
+    <script>
+        // 初始化函数 - 增强版
+        function initIframes() {
+            // 获取所有带有hide-scrollbar类的iframe
+            const iframes = document.querySelectorAll('iframe.hide-scrollbar');
+            console.log(`找到 ${iframes.length} 个iframe`);
+            
+            // 为每个iframe添加load事件监听器和sandbox属性
+            iframes.forEach((iframe, index) => {
+                // 添加唯一ID
+                if (!iframe.id) {
+                    iframe.id = `iframe-${index}`;
+                }
+                
+                // 添加sandbox属性允许脚本执行
+                iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-forms');
+                
+                // 处理iframe加载完成事件
+                iframe.addEventListener('load', function() {
+                    try {
+                        console.log(`处理iframe: ${iframe.id}`);
+                        // 获取iframe文档
+                        const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                        if (!iframeDocument) {
+                            console.warn(`无法访问iframe: ${iframe.id} 的内容，可能是跨域限制`);
+                            return;
+                        }
+                        
+                        // 添加全局无滚动条样式
+                        const linkElement = document.createElement('link');
+                        linkElement.rel = 'stylesheet';
+                        linkElement.href = './prototype/css/global-no-scrollbar.css';
+                        iframeDocument.head.appendChild(linkElement);
+                        
+                        // 添加内联样式以确保滚动条被隐藏
+                        const styleElement = document.createElement('style');
+                        styleElement.textContent = `
+                            ::-webkit-scrollbar { 
+                                width: 0 !important; 
+                                height: 0 !important; 
+                                display: none !important;
+                                background: transparent !important;
+                            }
+                            
+                            * {
+                                scrollbar-width: none !important;
+                                -ms-overflow-style: none !important;
+                                -webkit-tap-highlight-color: transparent;
+                            }
+                            
+                            html, body {
+                                overflow-x: hidden !important;
+                                overflow-y: auto !important;
+                                -webkit-overflow-scrolling: touch !important;
+                                overscroll-behavior: none !important;
+                                touch-action: manipulation !important;
+                            }
+                            
+                            div, section, main, article, aside, nav, 
+                            .container, .content, .wrapper, .section,
+                            .content-container {
+                                scrollbar-width: none !important;
+                                -ms-overflow-style: none !important;
+                            }
+                        `;
+                        iframeDocument.head.appendChild(styleElement);
+                        
+                        // 添加类到body元素
+                        if (iframeDocument.body) {
+                            iframeDocument.body.style.overflow = 'auto';
+                            iframeDocument.body.style.overflowX = 'hidden';
+                            iframeDocument.body.style.webkitOverflowScrolling = 'touch';
+                            iframeDocument.body.style.overscrollBehavior = 'none';
+                            iframeDocument.body.classList.add('no-scrollbar');
+                            
+                            // 处理所有可滚动元素
+                            const scrollContainers = iframeDocument.querySelectorAll('.content-container, .scroll-container, .moments-container, .chat-container, .achievements-list, .history-list');
+                            scrollContainers.forEach(container => {
+                                container.classList.add('scrollable');
+                                container.style.scrollbarWidth = 'none';
+                                container.style.msOverflowStyle = 'none';
+                            });
+                        }
+                        
+                        console.log(`成功处理iframe: ${iframe.id}`);
+                    } catch (error) {
+                        console.error(`处理iframe ${iframe.id} 时出错:`, error);
+                    }
+                });
+                
+                // 如果iframe已经加载，手动触发load事件
+                if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
+                    console.log(`iframe已加载，手动触发load事件: ${iframe.id}`);
+                    iframe.dispatchEvent(new Event('load'));
+                }
+            });
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('load', initIframes);
+        
+        // 如果页面已经加载完成，立即初始化
+        if (document.readyState === 'complete') {
+            initIframes();
+        }
+    </script>
 </body>
 </html> 
