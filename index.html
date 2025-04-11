@@ -702,6 +702,53 @@
         if (document.readyState === 'complete') {
             initIframes();
         }
+        
+        // 添加移动设备体验增强
+        document.addEventListener('DOMContentLoaded', function() {
+            // 防止双击缩放
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function(event) {
+                const now = Date.now();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+            
+            // 阻止默认的触摸行为
+            document.addEventListener('touchmove', function(event) {
+                // 允许iframe内部滚动
+                if (event.target.closest('iframe')) {
+                    return;
+                }
+                // 阻止body的弹性滚动效果
+                if (event.target === document.body) {
+                    event.preventDefault();
+                }
+            }, { passive: false });
+            
+            // 为所有iframe添加iOS风格的触摸交互
+            const iframes = document.querySelectorAll('iframe.hide-scrollbar');
+            iframes.forEach(iframe => {
+                // 添加触摸反馈效果
+                iframe.parentElement.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.98)';
+                });
+                
+                iframe.parentElement.addEventListener('touchend', function() {
+                    this.style.transform = 'scale(1)';
+                });
+                
+                // 添加hover效果
+                iframe.parentElement.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(0.99)';
+                });
+                
+                iframe.parentElement.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+        });
     </script>
 </body>
 </html> 
